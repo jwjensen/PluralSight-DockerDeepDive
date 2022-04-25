@@ -1,0 +1,84 @@
+
+* Image
+** docker image pull redis
+pulls a redis image from the cloud
+pulls manifest, layers, not a full image (fat manifest, which has a list of image manifests, then get image manifest)
+** docker system info
+shows system information, client and server.
+** docker image ls
+see the list of pulled images
+***  --digests
+shows the checksums of images
+** stored in /var/lib/docker/`storage driver`/diff
+** base layer holds OS files/objects (ubuntu, debian, redhat, centos, alpine, etc)
+**  docker history `image`
+shows how image was created
+**  docker image inspect `image`
+shows details of image
+* System
+** docker system info
+get system info
+* Containers
+
+* Docker tutorial: getting-started
+use app.zip:
+** spec
+** src
+** package.json
+#+BEGIN_SRC
+{
+  "name": "101-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "prettify": "prettier -l --write \"**/*.js\"",
+    "test": "jest",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "mysql": "^2.17.1",
+    "sqlite3": "^4.1.0",
+    "uuid": "^3.3.3",
+    "wait-port": "^0.2.2"
+  },
+  "prettier": {
+    "trailingComma": "all",
+    "tabWidth": 4,
+    "useTabs": false,
+    "semi": true,
+    "singleQuote": true
+  },
+  "devDependencies": {
+    "jest": "^24.9.0",
+    "nodemon": "^1.19.2",
+    "prettier": "^1.18.2"
+  }
+}
+#+END_SRC
+** Dockerfile
+#+BEGIN_SRC
+FROM node:12-alpine
+# Adding build tools to make yarn install work on Apple silicon / arm64 machines
+RUN apk add --no-cache python2 g++ make
+WORKDIR /app
+COPY . .
+RUN yarn install --production
+CMD ["node", "src/index.js"]
+#+END_SRC
+- uses a node:12-alpine base image 
+- runs the apk command to install python2, g++, make packages
+- creates the working dir /app, and populates from the current directory
+- runs yarn to install  the app
+- then runs the app via the CMD command
+** build a container *docker build -t getting-started .*
+Uses the Dockerfile to build the image
+"-t getting-started" tags the image 'getting-started'
+"." tells docker where to find the Dockerfile (current directory)
+** start a container *docker image run -dp 3000:3001  getting-started*
+"-d" detached mode
+"-p" port map 3000 inside the container is connected to 3001 on localhost (outside the container)
+** Make changes
+Change source code, config, etc..., then re-build (creates a new image
